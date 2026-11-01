@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trắc nghiệm Tin học</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--text:#1d2433;--muted:#5d677d;--pri:#2b5cff;--pri-t:#fff;--bd:#d9deea;--bad:#d92d3a;--good:#14833b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b202b;--text:#e8ecf5;--muted:#9aa5bb;--pri:#6b8cff;--pri-t:#0b1020;--bd:#2c3446;--bad:#ff6b75;--good:#4cd27f}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b202b;--text:#e8ecf5;--muted:#9aa5bb;--pri:#6b8cff;--pri-t:#0b1020;--bd:#2c3446;--bad:#ff6b75;--good:#4cd27f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-user-select:none;user-select:none}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:14px}
+h1{font-size:1.5rem;margin:0 0 8px}
+p{margin:6px 0;color:var(--muted)}
+.warn{border-left:4px solid var(--bad);padding-left:12px;color:var(--text)}
+input[type=text]{width:100%;padding:11px 12px;margin:6px 0 12px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--text);font-size:1rem;-webkit-user-select:text;user-select:text}
+button{background:var(--pri);color:var(--pri-t);border:0;border-radius:10px;padding:12px 20px;font-size:1rem;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 16px;margin-bottom:14px}
+.top b{font-variant-numeric:tabular-nums}
+.q h3{margin:0 0 10px;font-size:1.05rem}
+label{display:block;padding:10px 12px;margin:6px 0;border:1px solid var(--bd);border-radius:10px;cursor:pointer}
+label:has(input:checked){border-color:var(--pri);background:color-mix(in srgb,var(--pri) 12%,transparent)}
+label input{margin-right:8px}
+.score{font-size:3rem;font-weight:800;margin:6px 0}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div id="start" class="card">
+  <h1>Bài trắc nghiệm Tin học</h1>
+  <p>10 câu · 10 phút · mỗi câu 1 điểm</p>
+  <p class="warn"><b>Quy định:</b> Khi đã bắt đầu, nếu thu nhỏ cửa sổ, chuyển tab/ứng dụng, thoát toàn màn hình, chụp màn hình, nhấn chuột phải, sao chép hoặc mở công cụ nhà phát triển thì bài thi sẽ bị <b>0 điểm</b> ngay lập tức.</p>
+  <label style="border:0;padding:0">Họ và tên</label>
+  <input type="text" id="name" maxlength="60" autocomplete="off">
+  <label style="border:0;padding:0">Lớp</label>
+  <input type="text" id="cls" maxlength="20" autocomplete="off">
+  <button id="btnStart">Bắt đầu làm bài</button>
+</div>
+
+<div id="exam" class="hide">
+  <div class="top"><span id="who"></span><span>Còn lại: <b id="timer">10:00</b></span></div>
+  <div id="qs"></div>
+  <button id="btnSubmit">Nộp bài</button>
+</div>
+
+<div id="result" class="card hide">
+  <h1 id="rTitle"></h1>
+  <div class="score" id="rScore"></div>
+  <p id="rInfo"></p>
+  <p id="rReason"></p>
+</div>
+
+</div>
+<script>
+var QUESTIONS=[
+ {q:"CPU là viết tắt của cụm từ nào?",o:["Central Processing Unit","Computer Personal Unit","Central Program Utility","Control Processing Usage"],a:0},
+ {q:"1 byte bằng bao nhiêu bit?",o:["4 bit","8 bit","16 bit","10 bit"],a:1},
+ {q:"Thiết bị nào sau đây là thiết bị vào (input)?",o:["Màn hình","Máy in","Bàn phím","Loa"],a:2},
+ {q:"Phần mở rộng mặc định của tệp Word hiện nay là gì?",o:[".txt",".xlsx",".pptx",".docx"],a:3},
+ {q:"Phần mềm nào sau đây là hệ điều hành?",o:["Windows","Photoshop","Chrome","Excel"],a:0},
+ {q:"Máy tính biểu diễn thông tin bằng hệ nhị phân gồm các chữ số nào?",o:["0 và 9","1 và 2","0 và 1","0 đến 7"],a:2},
+ {q:"Tổ hợp phím nào dùng để sao chép (Copy)?",o:["Ctrl + V","Ctrl + C","Ctrl + X","Ctrl + Z"],a:1},
+ {q:"WWW là viết tắt của cụm từ nào?",o:["World Wide Web","Web With Windows","Wide World Window","World Web Wire"],a:0},
+ {q:"Bộ nhớ nào bị mất dữ liệu khi tắt nguồn điện?",o:["ROM","Ổ cứng HDD","USB","RAM"],a:3},
+ {q:"Hàm nào trong Excel dùng để tính tổng?",o:["COUNT","AVERAGE","SUM","MAX"],a:2}
+];
+var TOTAL=600, left=TOTAL, active=false, tick=null, fsOK=false, student="";
+var $=function(id){return document.getElementById(id)};
+
+function lsGet(){try{return JSON.parse(localStorage.getItem("tnth_done")||"null")}catch(e){return null}}
+function lsSet(v){try{localStorage.setItem("tnth_done",JSON.stringify(v))}catch(e){}}
+
+function show(id){["start","exam","result"].forEach(function(x){$(x).classList.add("hide")});$(id).classList.remove("hide")}
+
+function build(){
+  var h="";
+  QUESTIONS.forEach(function(q,i){
+    h+='<div class="card q"><h3>Câu '+(i+1)+'. '+q.q+'</h3>';
+    q.o.forEach(function(t,j){h+='<label><input type="radio" name="q'+i+'" value="'+j+'">'+String.fromCharCode(65+j)+'. '+t+'</label>'});
+    h+='</div>';
+  });
+  $("qs").innerHTML=h;
+}
+
+function finish(score,reason){
+  active=false;clearInterval(tick);
+  if(document.fullscreenElement&&document.exitFullscreen){try{document.exitFullscreen()}catch(e){}}
+  show("result");
+  var bad=!!reason;
+  $("rTitle").textContent=bad?"Bài thi bị hủy":"Đã nộp bài";
+  $("rScore").textContent=score+" / 10 điểm";
+  $("rScore").style.color=bad?"var(--bad)":"var(--good)";
+  $("rInfo").textContent="Thí sinh: "+student;
+  $("rReason").textContent=bad?"Lý do: "+reason:"Chúc mừng bạn đã hoàn thành bài thi.";
+  lsSet({name:student,score:score,reason:reason||""});
+}
+
+function submit(){
+  var s=0;
+  QUESTIONS.forEach(function(q,i){var c=document.querySelector('input[name="q'+i+'"]:checked');if(c&&+c.value===q.a)s++});
+  finish(s,"");
+}
+
+function violate(reason){if(!active)return;finish(0,reason)}
+
+function fmt(t){var m=Math.floor(t/60),s=t%60;return (m<10?"0":"")+m+":"+(s<10?"0":"")+s}
+
+function begin(){
+  var n=$("name").value.trim(),c=$("cls").value.trim();
+  if(!n||!c){alert("Vui lòng nhập họ tên và lớp.");return}
+  student=n+" - Lớp "+c;
+  $("who").textContent=student;
+  build();
+  var el=document.documentElement;
+  var p=el.requestFullscreen?el.requestFullscreen():null;
+  function go(ok){
+    fsOK=ok;show("exam");left=TOTAL;$("timer").textContent=fmt(left);
+    setTimeout(function(){active=true},800);
+    tick=setInterval(function(){left--;$("timer").textContent=fmt(left);if(left<=0)submit()},1000);
+  }
+  if(p&&p.then){p.then(function(){go(true)},function(){go(false)})}else{go(false)}
+}
+
+document.addEventListener("visibilitychange",function(){if(document.hidden)violate("Chuyển tab hoặc thu nhỏ cửa sổ")});
+window.addEventListener("blur",function(){setTimeout(function(){if(active&&!document.hasFocus())violate("Rời khỏi cửa sổ làm bài")},150)});
+window.addEventListener("pagehide",function(){violate("Rời khỏi trang")});
+document.addEventListener("fullscreenchange",function(){if(fsOK&&!document.fullscreenElement)violate("Thoát chế độ toàn màn hình")});
+document.addEventListener("keyup",function(e){if(e.key==="PrintScreen"){try{navigator.clipboard.writeText("")}catch(x){}violate("Chụp màn hình (PrintScreen)")}});
+document.addEventListener("keydown",function(e){
+  var k=(e.key||"").toLowerCase();
+  if(e.key==="PrintScreen")violate("Chụp màn hình (PrintScreen)");
+  else if(e.key==="Meta"||e.key==="OS")violate("Nhấn phím Windows/Command");
+  else if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&"ijc".indexOf(k)>-1)||(e.ctrlKey&&"upsc".indexOf(k)>-1&&k.length===1&&k!=="c")||(e.metaKey&&e.shiftKey))violate("Dùng phím tắt không được phép");
+  else if(e.ctrlKey&&k==="c")e.preventDefault();
+  if(e.key==="Escape"||e.altKey&&e.key==="Tab")violate("Thoát giao diện làm bài");
+});
+["contextmenu","copy","cut","paste","dragstart"].forEach(function(ev){
+  document.addEventListener(ev,function(e){if(active){e.preventDefault();if(ev==="contextmenu")violate("Nhấn chuột phải")}})});
+window.addEventListener("beforeprint",function(){violate("In trang")});
+
+$("btnStart").onclick=begin;
+$("btnSubmit").onclick=function(){if(confirm("Bạn chắc chắn muốn nộp bài?"))submit()};
+
+var prev=lsGet();
+if(prev){student=prev.name;show("result");
+  $("rTitle").textContent="Bạn đã làm bài này rồi";
+  $("rScore").textContent=prev.score+" / 10 điểm";
+  $("rScore").style.color=prev.reason?"var(--bad)":"var(--good)";
+  $("rInfo").textContent="Thí sinh: "+prev.name;
+  $("rReason").textContent=prev.reason?"Lý do: "+prev.reason:"";
+}
+</script>
+</body>
+</html>
